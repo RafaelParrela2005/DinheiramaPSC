@@ -41,6 +41,8 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
+        getContentPane().setBackground(new Color(234, 236, 238));
+
         menuBar = new JMenuBar();
 
         currentMoneyLabel = new JLabel("  Dinheiro: R$ " + currentMoney + "  | ");
