@@ -5,13 +5,16 @@ import java.awt.event.ActionListener;
 
 public class Main extends JFrame {
 
-    private int currentMoney = 0;
+    //Numeric variables
+    private int currentMoney = 10000;
     private int totalYear = 0;
     private int totalMonth = 1;
     private int totalDay = 1;
 
-    int workIncome = 10;
+    //income variables
+    private int workIncome = 10;
 
+    //upgrading variables
     private int upgradeCost_Freelancer = 100;
     private int upgradeLevel_Freelancer = 0;
 
@@ -26,8 +29,6 @@ public class Main extends JFrame {
 
     private int upgradeCost_Economy = 500;
     private int upgradeLevel_Economy = 0;
-
-    private int timeLevel_Days = 1;
 
     private JLabel currentMoneyLabel;
     private JLabel yearLabel;
@@ -77,12 +78,47 @@ public class Main extends JFrame {
         upgradeButton_Freelancer.setFocusable(false);
         upgradeButton_Freelancer.setBounds(20, 20, 150, 30);
         upgradeButton_Freelancer.setBackground(buttonColor);
+        upgradeButton_Freelancer.setToolTipText("+ 10R$ ao clicar em Trabalho. No nível máximo, +100R$.");
         add(upgradeButton_Freelancer);
 
         upgradeBar_Freelancer = new JProgressBar(0, 10);
         upgradeBar_Freelancer.setValue(upgradeLevel_Freelancer);
+        updateUpgradeBar_Freelancer();
+        upgradeBar_Freelancer.setStringPainted(true);
         upgradeBar_Freelancer.setBounds(180, 20, 150, 30);
         add(upgradeBar_Freelancer);
+
+        upgradeButton_Freelancer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (upgradeLevel_Freelancer < 10 && currentMoney >= upgradeCost_Freelancer) {
+                    currentMoney -= upgradeCost_Freelancer;
+                    upgradeLevel_Freelancer++;
+
+                    switch (upgradeLevel_Freelancer) {
+                        case 1: workIncome = 10; break;
+                        case 2: workIncome = 20; break;
+                        case 3: workIncome = 30; break;
+                        case 4: workIncome = 40; break;
+                        case 5: workIncome = 50; break;
+                        case 6: workIncome = 60; break;
+                        case 7: workIncome = 70; break;
+                        case 8: workIncome = 80; break;
+                        case 9: workIncome = 90; break;
+                        case 10: workIncome = 100; break;
+                    }
+
+                    // Update current money and upgrade bar
+                    currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
+                    upgradeBar_Freelancer.setValue(upgradeLevel_Freelancer);
+
+                    updateUpgradeBar_Freelancer();
+
+                    upgradeCost_Freelancer += 50;
+                }
+            }
+        });
+
 
         JButton upgradeButton_Enterprise = new JButton("Empreendimento");
         upgradeButton_Enterprise.setFocusable(false);
@@ -148,7 +184,7 @@ public class Main extends JFrame {
         timeBar_Month.setStringPainted(true);
         add(timeBar_Month);
 
-        Timer timer = new Timer(500, new ActionListener() {
+        Timer timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 totalDay++;
@@ -178,8 +214,12 @@ public class Main extends JFrame {
         setVisible(true);
     }
 
-    public void doWork() {
-
+    private void updateUpgradeBar_Freelancer() {
+        if (upgradeLevel_Freelancer >= 10) {
+            upgradeBar_Freelancer.setString("Limite atingido");
+        } else {
+            upgradeBar_Freelancer.setString("Custo: R$ " + upgradeCost_Freelancer + " | Nível: " + upgradeLevel_Freelancer + "/10");
+        }
     }
 
     // Main Method
