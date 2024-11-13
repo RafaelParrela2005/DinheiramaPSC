@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 public class Main extends JFrame {
 
     //Numeric variables
-    private int currentMoney = 10000;
+    private int currentMoney = 0;
     private int totalYear = 0;
     private int totalMonth = 1;
     private int totalDay = 1;
