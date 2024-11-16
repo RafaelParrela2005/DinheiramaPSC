@@ -82,7 +82,7 @@ public class Main extends JFrame {
         upgradeButton_Work.setFocusable(false);
         upgradeButton_Work.setBounds(20, 20, 150, 30);
         upgradeButton_Work.setBackground(buttonColor);
-        upgradeButton_Work.setToolTipText("+ 10R$ ao clicar em Trabalho. No nível máximo, +100R$.");
+        upgradeButton_Work.setToolTipText("+ 10R$ por nível ao clicar em Trabalho. No nível máximo, +100R$.");
         add(upgradeButton_Work);
         
         upgradeBar_Work = new JProgressBar(0, 10);
@@ -121,8 +121,6 @@ public class Main extends JFrame {
                 }
             }
         });
-
-
 
         JButton upgradeButton_Enterprise = new JButton("Empreendimento");
         upgradeButton_Enterprise.setFocusable(false);
@@ -172,7 +170,8 @@ public class Main extends JFrame {
         upgradeButton_StockMarket.setFocusable(false);
         upgradeButton_StockMarket.setBounds(20, 100, 150, 30);
         upgradeButton_StockMarket.setBackground(buttonColor);
-        upgradeButton_StockMarket.setToolTipText("Investir na bolsa de valores aumenta a chance de ganhar dinheiro no fim do mês. No nível máximo, +90% de chance de lucro.");
+        upgradeButton_StockMarket.setToolTipText("Investir na bolsa de valores aumenta a chance de ganhar dinheiro no fim do mês. "
+        		+ "No nível máximo, +90% de chance de lucro.");
         add(upgradeButton_StockMarket);
 
         upgradeBar_StockMarket = new JProgressBar(0, 10);
