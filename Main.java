@@ -1,40 +1,66 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Main extends JFrame {
 
-    // Numeric variables
+    //Numeric variables
     private int currentMoney = 0;
     private int totalYear = 0;
     private int totalMonth = 1;
     private int totalDay = 1;
 
-    // JLabel para exibição de dados
+    //income variables
+    private int workIncome = 10;
+    private int enterpriseIncome = 10;
+    private int stockMarketIncome = 10;
+    private int realStateMarketIncome = 10;
+    
+
+    //upgrading variables
+    private int upgradeCost_Work = 100;
+    private int upgradeLevel_Work = 0;
+
+    private int upgradeCost_Enterprise = 200;
+    private int upgradeLevel_Enterprise = 0;
+
+    private int upgradeCost_StockMarket = 300;
+    private int upgradeLevel_StockMarket = 0;
+
+    private int upgradeCost_RealEstateMarket = 400;
+    private int upgradeLevel_RealEstateMarket = 0;
+
+    private int upgradeCost_Economy = 500;
+    private int upgradeLevel_Economy = 0;
+
     private JLabel currentMoneyLabel;
     private JLabel yearLabel;
     private JLabel monthLabel;
     private JLabel dayLabel;
 
+    private JProgressBar upgradeBar_Work;
+    private JProgressBar upgradeBar_Enterprise;
+    private JProgressBar upgradeBar_StockMarket;
+    private JProgressBar upgradeBar_RealEstateMarket;
+    private JProgressBar upgradeBar_Economy;
     private JProgressBar timeBar_Month;
 
-    private final int[][] upgradeLevels = {{0}, {0}, {0}, {0}, {0}};
-    private final int[][] upgradeCosts = {{100}, {200}, {300}, {400}, {500}};
-    private final int[][] incomes = {{10}, {0}, {0}, {0}, {0}};
-    private final String[] upgradeNames = {"Hora Extra", "Empreendimento", "Bolsa de Valores", "Mercado Imobiliário", "Economias"};
+
+    private JMenuBar menuBar;
 
     public Main() {
-        // JFrame configuration
+        //JFrame Config
         setTitle("Dinheirama");
         setSize(800, 500);
         setLayout(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+
         getContentPane().setBackground(new Color(234, 236, 238));
 
-        // Menu Bar
-        JMenuBar menuBar = new JMenuBar();
+        menuBar = new JMenuBar();
 
         currentMoneyLabel = new JLabel("  Dinheiro: R$ " + currentMoney + "  | ");
         menuBar.add(currentMoneyLabel);
@@ -52,41 +78,147 @@ public class Main extends JFrame {
 
         Color buttonColor = new Color(133, 193, 233);
 
-        // Upgrade buttons and progress bars
-        for (int i = 0; i < upgradeNames.length; i++) {
-            int yOffset = 20 + (i * 40);
+        JButton upgradeButton_Work = new JButton("Hora Extra");
+        upgradeButton_Work.setFocusable(false);
+        upgradeButton_Work.setBounds(20, 20, 150, 30);
+        upgradeButton_Work.setBackground(buttonColor);
+        upgradeButton_Work.setToolTipText("+ 10R$ ao clicar em Trabalho. No nível máximo, +100R$.");
+        add(upgradeButton_Work);
+        
+        upgradeBar_Work = new JProgressBar(0, 10);
+        upgradeBar_Work.setValue(upgradeLevel_Work);
+        upgradeBar_Work.setStringPainted(true);
+        upgradeBar_Work.setBounds(180, 20, 150, 30);
+        add(upgradeBar_Work);
+        updateUpgradeBar(upgradeBar_Work, upgradeLevel_Work, upgradeCost_Work, 10);
 
-            JButton upgradeButton = new JButton(upgradeNames[i]);
-            upgradeButton.setFocusable(false);
-            upgradeButton.setBounds(20, yOffset, 150, 30);
-            upgradeButton.setBackground(buttonColor);
-            upgradeButton.setToolTipText("Custo: R$ " + upgradeCosts[i][0] + " | Aumenta eficiência.");
-            add(upgradeButton);
+        upgradeButton_Work.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (upgradeLevel_Work < 10 && currentMoney >= upgradeCost_Work) {
+                    currentMoney -= upgradeCost_Work;
+                    upgradeLevel_Work++;
 
-            JProgressBar upgradeBar = new JProgressBar(0, 10);
-            upgradeBar.setValue(upgradeLevels[i][0]);
-            upgradeBar.setStringPainted(true);
-            upgradeBar.setBounds(180, yOffset, 150, 30);
-            add(upgradeBar);
+                    switch (upgradeLevel_Work) {
+                        case 0: workIncome = 5; break;
+                        case 1: workIncome = 10; break;
+                        case 2: workIncome = 20; break;
+                        case 3: workIncome = 30; break;
+                        case 4: workIncome = 40; break;
+                        case 5: workIncome = 50; break;
+                        case 6: workIncome = 60; break;
+                        case 7: workIncome = 70; break;
+                        case 8: workIncome = 80; break;
+                        case 9: workIncome = 90; break;
+                        case 10: workIncome = 100; break;
+                    }
 
-            updateUpgradeBar(upgradeBar, upgradeLevels[i][0], upgradeCosts[i][0], 10);
+                    currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
+                    upgradeBar_Work.setValue(upgradeLevel_Work);
 
-            int index = i;
-            upgradeButton.addActionListener(e -> handleUpgrade(upgradeBar, upgradeLevels[index], upgradeCosts[index], incomes[index], 10));
-        }
+                    upgradeCost_Work += 50;
+                    updateUpgradeBar(upgradeBar_Work, upgradeLevel_Work, upgradeCost_Work, 10);
+                }
+            }
+        });
 
-        // Work button
+
+
+        JButton upgradeButton_Enterprise = new JButton("Empreendimento");
+        upgradeButton_Enterprise.setFocusable(false);
+        upgradeButton_Enterprise.setBounds(20, 60, 150, 30);
+        upgradeButton_Enterprise.setBackground(buttonColor);
+        add(upgradeButton_Enterprise);
+
+        upgradeBar_Enterprise = new JProgressBar(0, 10);
+        upgradeBar_Enterprise.setValue(upgradeLevel_Enterprise);
+        upgradeBar_Enterprise.setStringPainted(true);
+        upgradeBar_Enterprise.setBounds(180, 60, 150, 30);
+        add(upgradeBar_Enterprise);
+        updateUpgradeBar(upgradeBar_Enterprise, upgradeLevel_Enterprise, upgradeCost_Enterprise, 10);
+        
+        upgradeButton_Enterprise.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (upgradeLevel_Enterprise < 10 && currentMoney >= upgradeCost_Enterprise) {
+                    currentMoney -= upgradeCost_Enterprise;
+                    upgradeLevel_Enterprise++;
+
+                    switch (upgradeLevel_Enterprise) {
+                        case 0: workIncome = 5; break;
+                        case 1: workIncome = 10; break;
+                        case 2: workIncome = 20; break;
+                        case 3: workIncome = 30; break;
+                        case 4: workIncome = 40; break;
+                        case 5: workIncome = 50; break;
+                        case 6: workIncome = 60; break;
+                        case 7: workIncome = 70; break;
+                        case 8: workIncome = 80; break;
+                        case 9: workIncome = 90; break;
+                        case 10: workIncome = 100; break;
+                    }
+
+                    currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
+                    upgradeBar_Work.setValue(upgradeLevel_Work);
+
+                    upgradeCost_Work += 50;
+                    updateUpgradeBar(upgradeBar_Work, upgradeLevel_Work, upgradeCost_Work, 10);
+                }
+            }
+        });
+
+        JButton upgradeButton_StockMarket = new JButton("Bolsa de Valores");
+        upgradeButton_StockMarket.setFocusable(false);
+        upgradeButton_StockMarket.setBounds(20, 100, 150, 30);
+        upgradeButton_StockMarket.setBackground(buttonColor);
+        add(upgradeButton_StockMarket);
+
+        upgradeBar_StockMarket = new JProgressBar(0, 10);
+        upgradeBar_StockMarket.setValue(upgradeLevel_StockMarket);
+        upgradeBar_StockMarket.setStringPainted(true);
+        upgradeBar_StockMarket.setBounds(180, 100, 150, 30);
+        add(upgradeBar_StockMarket);
+        updateUpgradeBar(upgradeBar_StockMarket, upgradeLevel_StockMarket, upgradeCost_StockMarket, 10);
+
+        JButton upgradeButton_RealEstateMarket = new JButton("Mercado Imobiliario");
+        upgradeButton_RealEstateMarket.setFocusable(false);
+        upgradeButton_RealEstateMarket.setBounds(20, 140, 150, 30);
+        upgradeButton_RealEstateMarket.setBackground(buttonColor);
+        add(upgradeButton_RealEstateMarket);
+
+        upgradeBar_RealEstateMarket = new JProgressBar(0, 10);
+        upgradeBar_RealEstateMarket.setValue(upgradeLevel_RealEstateMarket);
+        upgradeBar_RealEstateMarket.setStringPainted(true);
+        upgradeBar_RealEstateMarket.setBounds(180, 140, 150, 30);
+        add(upgradeBar_RealEstateMarket);
+        updateUpgradeBar(upgradeBar_RealEstateMarket, upgradeLevel_RealEstateMarket, upgradeCost_RealEstateMarket, 10);
+
+        JButton upgradeButton_Economy = new JButton("Economizar");
+        upgradeButton_Economy.setFocusable(false);
+        upgradeButton_Economy.setBounds(20, 180, 150, 30);
+        upgradeButton_Economy.setBackground(buttonColor);
+        add(upgradeButton_Economy);
+
+        upgradeBar_Economy = new JProgressBar(0, 10);
+        upgradeBar_Economy.setValue(upgradeLevel_Economy);
+        upgradeBar_Economy.setStringPainted(true);
+        upgradeBar_Economy.setBounds(180, 180, 150, 30);
+        add(upgradeBar_Economy);
+        updateUpgradeBar(upgradeBar_Economy, upgradeLevel_Economy, upgradeCost_Economy, 10);
+
         JButton workButton = new JButton("Trabalhar");
         workButton.setFocusable(false);
         workButton.setBounds(615, 20, 150, 30);
         workButton.setBackground(buttonColor);
-        workButton.addActionListener(e -> {
-            currentMoney += incomes[0][0];
-            currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
+        workButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentMoney += workIncome;
+                currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
+            }
         });
         add(workButton);
 
-        // Time progress bar
         timeBar_Month = new JProgressBar(0, 31);
         timeBar_Month.setValue(totalDay);
         timeBar_Month.setBounds(615, 60, 150, 20);
@@ -94,49 +226,38 @@ public class Main extends JFrame {
         timeBar_Month.setStringPainted(true);
         add(timeBar_Month);
 
-        // In-game timer
-        Timer timer = new Timer(1000, e -> {
-            totalDay++;
-            timeBar_Month.setValue(totalDay);
-            timeBar_Month.setString("Dia " + totalDay + " | Faltam " + (31 - totalDay) + " dias");
-
-            if (totalDay > 31) {
-                totalDay = 1;
-                totalMonth++;
+      // Ingame Timer Method  
+      Timer timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                totalDay++;
                 timeBar_Month.setValue(totalDay);
                 timeBar_Month.setString("Dia " + totalDay + " | Faltam " + (31 - totalDay) + " dias");
 
-                if (totalMonth > 12) {
-                    totalMonth = 1;
-                    totalYear++;
-                }
-            }
+                if (totalDay > 31) {
+                    totalDay = 1;
+                    totalMonth++;
+                    timeBar_Month.setValue(totalDay);
+                    timeBar_Month.setString("Dia " + totalDay + " | Faltam " + (31 - totalDay) + " dias");
 
-            dayLabel.setText(" Dia: " + totalDay + " | ");
-            monthLabel.setText(" Mês: " + totalMonth);
-            yearLabel.setText(" Ano: " + totalYear + " | ");
+                    if (totalMonth > 12) {
+                        totalMonth = 1;
+                        totalYear++;
+                    }
+                }
+
+                dayLabel.setText(" Dia: " + totalDay + " | ");
+                monthLabel.setText(" Mês: " + totalMonth);
+                yearLabel.setText(" Ano: " + totalYear + " | ");
+            }
         });
 
         timer.start();
+
         setVisible(true);
     }
 
-    // Generic Method for Upgrades
-    private void handleUpgrade(JProgressBar upgradeBar, int[] upgradeLevel, int[] upgradeCost, int[] income, int maxLevel) {
-        if (upgradeLevel[0] < maxLevel && currentMoney >= upgradeCost[0]) {
-            currentMoney -= upgradeCost[0];
-            upgradeLevel[0]++;
-            income[0] += 10;
-
-            currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
-            upgradeBar.setValue(upgradeLevel[0]);
-            upgradeCost[0] += 50;
-
-            updateUpgradeBar(upgradeBar, upgradeLevel[0], upgradeCost[0], maxLevel);
-        }
-    }
-
-    // Generic Mehtod for Bar Handling
+    // Upgrade Method
     private void updateUpgradeBar(JProgressBar upgradeBar, int upgradeLevel, int upgradeCost, int maxLevel) {
         if (upgradeLevel >= maxLevel) {
             upgradeBar.setString("Limite atingido");
@@ -144,6 +265,7 @@ public class Main extends JFrame {
             upgradeBar.setString("Custo: R$ " + upgradeCost + " | Nível: " + upgradeLevel + "/" + maxLevel);
         }
     }
+
 
     // Main Method
     public static void main(String[] args) {
