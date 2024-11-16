@@ -96,6 +96,7 @@ public class Main extends JFrame {
                     upgradeLevel_Freelancer++;
 
                     switch (upgradeLevel_Freelancer) {
+                        case 0: workIncome = 5; break;
                         case 1: workIncome = 10; break;
                         case 2: workIncome = 20; break;
                         case 3: workIncome = 30; break;
@@ -108,7 +109,6 @@ public class Main extends JFrame {
                         case 10: workIncome = 100; break;
                     }
 
-                    // Update current money and upgrade bar
                     currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
                     upgradeBar_Freelancer.setValue(upgradeLevel_Freelancer);
 
@@ -184,7 +184,8 @@ public class Main extends JFrame {
         timeBar_Month.setStringPainted(true);
         add(timeBar_Month);
 
-        Timer timer = new Timer(1000, new ActionListener() {
+      // Ingame Timer Method  
+      Timer timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 totalDay++;
@@ -214,6 +215,7 @@ public class Main extends JFrame {
         setVisible(true);
     }
 
+    // Upgrade Method
     private void updateUpgradeBar_Freelancer() {
         if (upgradeLevel_Freelancer >= 10) {
             upgradeBar_Freelancer.setString("Limite atingido");
