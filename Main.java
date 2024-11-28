@@ -7,6 +7,8 @@ public class Main extends JFrame {
 
     //Numeric variables
     private int currentMoney = 0;
+    private int monthlyEarnings = 0;
+    private int monthlyExpenses = 0;
     private int totalYear = 0;
     private int totalMonth = 1;
     private int totalDay = 1;
@@ -97,6 +99,7 @@ public class Main extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (upgradeLevel_Work < 10 && currentMoney >= upgradeCost_Work) {
                     currentMoney -= upgradeCost_Work;
+                    monthlyExpenses += upgradeCost_Work;
                     upgradeLevel_Work++;
 
                     switch (upgradeLevel_Work) {
@@ -122,8 +125,6 @@ public class Main extends JFrame {
             }
         });
 
-
-
         JButton upgradeButton_Enterprise = new JButton("Empreendimento");
         upgradeButton_Enterprise.setFocusable(false);
         upgradeButton_Enterprise.setBounds(20, 60, 150, 30);
@@ -143,6 +144,7 @@ public class Main extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (upgradeLevel_Enterprise < 10 && currentMoney >= upgradeCost_Enterprise) {
                     currentMoney -= upgradeCost_Enterprise;
+                    monthlyExpenses += upgradeCost_Enterprise;
                     upgradeLevel_Enterprise++;
 
                     switch (upgradeLevel_Enterprise) {
@@ -173,7 +175,8 @@ public class Main extends JFrame {
         upgradeButton_StockMarket.setFocusable(false);
         upgradeButton_StockMarket.setBounds(20, 100, 150, 30);
         upgradeButton_StockMarket.setBackground(buttonColor);
-        upgradeButton_StockMarket.setToolTipText("Investir na bolsa de valores aumenta a chance de ganhar dinheiro no fim do mês. No nível máximo, +90% de chance de lucro.");
+        upgradeButton_StockMarket.setToolTipText("Investir na bolsa de valores aumenta a chance de ganhar dinheiro no fim do mês. "
+        		+ "No nível máximo, +90% de chance de lucro.");
         add(upgradeButton_StockMarket);
 
         upgradeBar_StockMarket = new JProgressBar(0, 10);
@@ -188,6 +191,7 @@ public class Main extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (upgradeLevel_StockMarket < 10 && currentMoney >= upgradeCost_StockMarket) {
                     currentMoney -= upgradeCost_StockMarket;
+                    monthlyExpenses += upgradeCost_StockMarket;
                     upgradeLevel_StockMarket++;
 
                     switch (upgradeLevel_StockMarket) {
@@ -232,6 +236,7 @@ public class Main extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (upgradeLevel_RealEstateMarket < 10 && currentMoney >= upgradeCost_RealEstateMarket) {
                     currentMoney -= upgradeCost_RealEstateMarket;
+                    monthlyExpenses += upgradeCost_RealEstateMarket;
                     upgradeLevel_RealEstateMarket++;
 
                     switch (upgradeLevel_RealEstateMarket) {
@@ -252,7 +257,8 @@ public class Main extends JFrame {
                     upgradeBar_RealEstateMarket.setValue(upgradeLevel_RealEstateMarket);
 
                     upgradeCost_RealEstateMarket += 50;
-                    updateUpgradeBar(upgradeBar_RealEstateMarket, upgradeLevel_RealEstateMarket, upgradeCost_RealEstateMarket, 10, upgradeButton_RealEstateMarket);
+                    updateUpgradeBar(upgradeBar_RealEstateMarket, upgradeLevel_RealEstateMarket, upgradeCost_RealEstateMarket, 10, 
+                    		upgradeButton_RealEstateMarket);
                 }
             }
         });
@@ -276,6 +282,7 @@ public class Main extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (upgradeLevel_Economy < 10 && currentMoney >= upgradeCost_Economy) {
                     currentMoney -= upgradeCost_Economy;
+                    monthlyExpenses += upgradeCost_Economy;
                     upgradeLevel_Economy++;
 
                     currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
@@ -295,6 +302,7 @@ public class Main extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 currentMoney += workIncome;
+                monthlyEarnings += workIncome;
                 currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
             }
         });
@@ -309,7 +317,7 @@ public class Main extends JFrame {
 
         // Ingame Timer Method
         Timer timer = new Timer(1000, new ActionListener() {
-            private int totalDiscount = 500; // Inicia o desconto inicial
+            private int totalDiscount = 500;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -323,30 +331,20 @@ public class Main extends JFrame {
                     timeBar_Month.setValue(totalDay);
                     timeBar_Month.setString("Dia " + totalDay + " | Faltam " + (31 - totalDay) + " dias");
 
-                    // Verifica se é hora de aplicar o desconto
-                    if (totalMonth % 6 == 1) { // A cada 6 meses o desconto aumenta
+                    if (totalMonth % 6 == 1) {
                         totalDiscount += 500;
                     }
                     currentMoney -= totalDiscount;
-                    currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
+                    monthlyExpenses += totalDiscount;
 
-
-
-                    // Adiciona a renda passiva ao início de cada mês
-                    if (upgradeLevel_Enterprise >=1){
+                    if (upgradeLevel_Enterprise >= 1) {
                         currentMoney += enterpriseIncome;
+                        monthlyEarnings += enterpriseIncome;
                     }
 
-                    if (upgradeLevel_StockMarket >=1){
-
-                    }
-
-                    if (upgradeLevel_RealEstateMarket >=1){
+                    if (upgradeLevel_RealEstateMarket >= 1) {
                         currentMoney += realEstateMarketIncome;
-                    }
-
-                    if (upgradeLevel_Economy >=1){
-
+                        monthlyEarnings += realEstateMarketIncome;
                     }
 
                     currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
@@ -355,6 +353,18 @@ public class Main extends JFrame {
                         totalMonth = 1;
                         totalYear++;
                     }
+
+                    int netProfit = monthlyEarnings - monthlyExpenses;
+                    if (netProfit >= 0) {
+                        JOptionPane.showMessageDialog(null, "Neste mês, você lucrou R$" + netProfit + ". O total de dinheiro que você tem é R$" + 
+                    currentMoney + ".");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Neste mês, você perdeu R$" + Math.abs(netProfit) + ". O total de dinheiro que você tem é R$" +
+                    currentMoney + ".");
+                    }
+
+                    monthlyEarnings = 0;
+                    monthlyExpenses = 0;
                 }
 
                 dayLabel.setText(" Dia: " + totalDay + " | ");
@@ -362,6 +372,7 @@ public class Main extends JFrame {
                 yearLabel.setText(" Ano: " + totalYear + " | ");
             }
         });
+
 
 
         timer.start();
