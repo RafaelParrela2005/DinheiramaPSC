@@ -2,6 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Random;
 
 public class Main extends JFrame {
 
@@ -51,7 +56,12 @@ public class Main extends JFrame {
 
     private JMenuBar menuBar;
 
-    public Main() {
+    
+    
+    
+    
+    
+    public Main() throws ClassNotFoundException, SQLException {
         //JFrame Config
         setTitle("Dinheirama");
         setSize(800, 500);
@@ -276,7 +286,24 @@ public class Main extends JFrame {
         upgradeBar_Economy.setBounds(180, 180, 150, 30);
         add(upgradeBar_Economy);
         updateUpgradeBar(upgradeBar_Economy, upgradeLevel_Economy, upgradeCost_Economy, 10, upgradeButton_Economy);
-
+      //INSERT No Banco de Dados
+        //Sql Query
+        String insertQuery = "insert into player(saldo_atual,id) values(?,?)";
+        String upsertQuery = "INSERT INTO player (id, saldo_atual) VALUES (?, ?) ON DUPLICATE KEY UPDATE saldo_atual = ?";
+        
+      //Registrando o Driver
+      	Class.forName("com.mysql.cj.jdbc.Driver");
+      //Fazendo a Conexao
+      		
+      Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dinheirama","root","amiguel101");
+      PreparedStatement pstmt = con.prepareStatement(insertQuery);
+      PreparedStatement pstmt2 = con.prepareStatement(upsertQuery);
+      System.out.println("Conexão feita com sucesso");
+        
+       //Gerar um Id 
+        
+        int id = 0;
+        id = id + 1;
         upgradeButton_Economy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -362,19 +389,39 @@ public class Main extends JFrame {
                         JOptionPane.showMessageDialog(null, "Neste mês, você perdeu R$" + Math.abs(netProfit) + ". O total de dinheiro que você tem é R$" +
                     currentMoney + ".");
                     }
-
+                    
                     monthlyEarnings = 0;
                     monthlyExpenses = 0;
+                    try {
+                    	pstmt.setInt(1, id); // Insere o ID (chave única)
+                        pstmt.setInt(2, currentMoney); // Insere o saldo atual
+                        pstmt.setInt(3, currentMoney); // Atualiza o saldo atual se já existir
+                        
+                        // Executa o UPSERT
+                        pstmt.executeUpdate();
+    		            int rowsInserted = pstmt.executeUpdate();
+    				} catch (SQLException e1) {
+    					// TODO Auto-generated catch block
+    					e1.printStackTrace();
+    				}
+                    
                 }
 
                 dayLabel.setText(" Dia: " + totalDay + " | ");
                 monthLabel.setText(" Mês: " + totalMonth);
                 yearLabel.setText(" Ano: " + totalYear + " | ");
+             // Substitui os placeholders "?" pelos valores
+               
+
+                
             }
         });
-
-
-
+ 
+        
+        
+     
+        
+        
         timer.start();
 
         setVisible(true);
@@ -392,7 +439,15 @@ public class Main extends JFrame {
 
 
     // Main Method
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(Main::new);
+    public static void main(String[] args)  {
+        SwingUtilities.invokeLater(() -> {
+			try {
+				new Main();
+			} catch (ClassNotFoundException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+        
     }
 }
