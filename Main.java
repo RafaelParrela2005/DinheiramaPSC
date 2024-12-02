@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main extends JFrame {
 
@@ -21,7 +22,7 @@ public class Main extends JFrame {
     //income variables
     private int workIncome = 10;
     private int enterpriseIncome = 10;
-    private int stockMarketIncome = 10;
+    
     private int realEstateMarketIncome = 10;
 
 
@@ -32,8 +33,7 @@ public class Main extends JFrame {
     private int upgradeCost_Enterprise = 200;
     private int upgradeLevel_Enterprise = 0;
 
-    private int upgradeCost_StockMarket = 300;
-    private int upgradeLevel_StockMarket = 0;
+    
 
     private int upgradeCost_RealEstateMarket = 400;
     private int upgradeLevel_RealEstateMarket = 0;
@@ -48,10 +48,11 @@ public class Main extends JFrame {
 
     private JProgressBar upgradeBar_Work;
     private JProgressBar upgradeBar_Enterprise;
-    private JProgressBar upgradeBar_StockMarket;
+    
     private JProgressBar upgradeBar_RealEstateMarket;
     private JProgressBar upgradeBar_Economy;
     private JProgressBar timeBar_Month;
+    private int currentInvestment = 0;
 
 
     private JMenuBar menuBar;
@@ -185,48 +186,22 @@ public class Main extends JFrame {
         upgradeButton_StockMarket.setFocusable(false);
         upgradeButton_StockMarket.setBounds(20, 100, 150, 30);
         upgradeButton_StockMarket.setBackground(buttonColor);
-        upgradeButton_StockMarket.setToolTipText("Investir na bolsa de valores aumenta a chance de ganhar dinheiro no fim do mês. "
-        		+ "No nível máximo, +90% de chance de lucro.");
+        upgradeButton_StockMarket.setToolTipText("Clique para aumentar o valor a ser investido em múltiplos de 100.");
         add(upgradeButton_StockMarket);
-
-        upgradeBar_StockMarket = new JProgressBar(0, 10);
-        upgradeBar_StockMarket.setValue(upgradeLevel_StockMarket);
-        upgradeBar_StockMarket.setStringPainted(true);
-        upgradeBar_StockMarket.setBounds(180, 100, 150, 30);
-        add(upgradeBar_StockMarket);
-        updateUpgradeBar(upgradeBar_StockMarket, upgradeLevel_StockMarket, upgradeCost_StockMarket, 10, upgradeButton_StockMarket);
 
         upgradeButton_StockMarket.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (upgradeLevel_StockMarket < 10 && currentMoney >= upgradeCost_StockMarket) {
-                    currentMoney -= upgradeCost_StockMarket;
-                    monthlyExpenses += upgradeCost_StockMarket;
-                    upgradeLevel_StockMarket++;
-
-                    switch (upgradeLevel_StockMarket) {
-                        case 0: stockMarketIncome = 5; break;
-                        case 1: stockMarketIncome = 10; break;
-                        case 2: stockMarketIncome = 20; break;
-                        case 3: stockMarketIncome = 30; break;
-                        case 4: stockMarketIncome = 40; break;
-                        case 5: stockMarketIncome = 50; break;
-                        case 6: stockMarketIncome = 60; break;
-                        case 7: stockMarketIncome = 70; break;
-                        case 8: stockMarketIncome = 80; break;
-                        case 9: stockMarketIncome = 90; break;
-                        case 10: stockMarketIncome = 100; break;
-                    }
-
+                if (currentMoney >= currentInvestment + 100) {
+                    currentInvestment += 100;
+                    currentMoney -= 100; // Desconta do saldo
                     currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
-                    upgradeBar_StockMarket.setValue(upgradeLevel_StockMarket);
-
-                    upgradeCost_StockMarket += 50;
-                    updateUpgradeBar(upgradeBar_StockMarket, upgradeLevel_StockMarket, upgradeCost_StockMarket, 10, upgradeButton_StockMarket);
+                    JOptionPane.showMessageDialog(null, "Você aumentou o valor a ser investido para R$" + currentInvestment + ".");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Você não tem saldo suficiente para aumentar o investimento.");
                 }
             }
         });
-
         JButton upgradeButton_RealEstateMarket = new JButton("Mercado Imobiliario");
         upgradeButton_RealEstateMarket.setFocusable(false);
         upgradeButton_RealEstateMarket.setBounds(20, 140, 150, 30);
@@ -288,22 +263,21 @@ public class Main extends JFrame {
         updateUpgradeBar(upgradeBar_Economy, upgradeLevel_Economy, upgradeCost_Economy, 10, upgradeButton_Economy);
       //INSERT No Banco de Dados
         //Sql Query
-        String insertQuery = "insert into player(saldo_atual,id) values(?,?)";
-        String upsertQuery = "INSERT INTO player (id, saldo_atual) VALUES (?, ?) ON DUPLICATE KEY UPDATE saldo_atual = ?";
+        String insertQuery = "insert into player(saldo_atual) values(?)";
+        String upsertQuery = "INSERT INTO player (saldo_atual) VALUES (?) ON DUPLICATE KEY UPDATE saldo_atual = ?";
         
       //Registrando o Driver
       	Class.forName("com.mysql.cj.jdbc.Driver");
       //Fazendo a Conexao
       		
-      Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dinheirama","root","amiguel101");
+      Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dinheirama","root","123456");
       PreparedStatement pstmt = con.prepareStatement(insertQuery);
       PreparedStatement pstmt2 = con.prepareStatement(upsertQuery);
       System.out.println("Conexão feita com sucesso");
         
        //Gerar um Id 
         
-        int id = 0;
-        id = id + 1;
+        
         upgradeButton_Economy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -392,38 +366,39 @@ public class Main extends JFrame {
                     
                     monthlyEarnings = 0;
                     monthlyExpenses = 0;
-                    try {
-                    	pstmt.setInt(1, id); // Insere o ID (chave única)
-                        pstmt.setInt(2, currentMoney); // Insere o saldo atual
-                        pstmt.setInt(3, currentMoney); // Atualiza o saldo atual se já existir
-                        
-                        // Executa o UPSERT
-                        pstmt.executeUpdate();
-    		            int rowsInserted = pstmt.executeUpdate();
-    				} catch (SQLException e1) {
-    					// TODO Auto-generated catch block
-    					e1.printStackTrace();
-    				}
                     
-                }
+                    if (currentInvestment > 0) {
+                        Random random = new Random();
+                        double multiplier = 0.8 + (1.2 - 0.8) * random.nextDouble(); // Gera o multiplicador aleatório
+                        int profit = (int) (currentInvestment * multiplier); // Calcula o lucro
+                        currentMoney += profit; // Adiciona o lucro ao saldo
+                        JOptionPane.showMessageDialog(null, "O investimento de R$" + currentInvestment +
+                                " resultou em um retorno de R$" + profit + " (Multiplicador: " + String.format("%.2f", multiplier) + ").");
+                        currentInvestment = 0; // Reseta o valor do investimento
+                        currentMoneyLabel.setText("  Dinheiro: R$ " + currentMoney + "  | ");
+                    }
+                    try {
+                    	
+                   	 String insertQuery = "INSERT INTO players (mes, ano, saldo_atual) VALUES (?, ?, ?)";
+                        PreparedStatement pstmt = con.prepareStatement(insertQuery);
+                        pstmt.setInt(1, totalMonth); // Define o mês
+                        pstmt.setInt(2, totalYear); // Define o ano
+                        pstmt.setDouble(3, currentMoney); // Define o saldo atual
 
+                        pstmt.executeUpdate(); // Executa a inserção
+                        System.out.println("Registro adicionado ao banco de dados: Mês " + totalMonth + ", Ano " + totalYear + ", Saldo: R$ " + currentMoney);
+   				} catch (SQLException e1) {
+   					// TODO Auto-generated catch block
+   					e1.printStackTrace();
+   				}
+                }
                 dayLabel.setText(" Dia: " + totalDay + " | ");
                 monthLabel.setText(" Mês: " + totalMonth);
                 yearLabel.setText(" Ano: " + totalYear + " | ");
-             // Substitui os placeholders "?" pelos valores
-               
-
-                
+    
             }
         });
- 
-        
-        
-     
-        
-        
         timer.start();
-
         setVisible(true);
     }
 
