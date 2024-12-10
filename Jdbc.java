@@ -8,7 +8,7 @@ public class Jdbc {
 		Class.forName("com.mysql.cj.jdbc.Driver");
 		//Fazendo a Conexao
 		
-		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/Dinheirama","root","amiguel101");
+		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/Dinheirama","root","123456");
 		System.out.println("Conexão feita com sucesso");
 		
 	}
